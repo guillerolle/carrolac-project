@@ -4,6 +4,10 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/dist-packages" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/site-packages" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/carrolac-ros2ws/bags" />
+      <excludeFolder url="file://$MODULE_DIR$/carrolac-ros2ws/build" />
+      <excludeFolder url="file://$MODULE_DIR$/carrolac-ros2ws/install" />
+      <excludeFolder url="file://$MODULE_DIR$/carrolac-ros2ws/log" />
       <excludeFolder url="file://$MODULE_DIR$/dist-packages/ackermann_msgs" />
       <excludeFolder url="file://$MODULE_DIR$/dist-packages/ackermann_msgs-2.0.2-py3.10.egg-info" />
       <excludeFolder url="file://$MODULE_DIR$/dist-packages/action_msgs" />
@@ -173,10 +177,6 @@
       <excludeFolder url="file://$MODULE_DIR$/docker-home/.ros" />
       <excludeFolder url="file://$MODULE_DIR$/docker-home/.rviz2" />
       <excludeFolder url="file://$MODULE_DIR$/docker-home/.sdformat" />
-      <excludeFolder url="file://$MODULE_DIR$/docker-home/carrolac-ros2ws/bags" />
-      <excludeFolder url="file://$MODULE_DIR$/docker-home/carrolac-ros2ws/build" />
-      <excludeFolder url="file://$MODULE_DIR$/docker-home/carrolac-ros2ws/install" />
-      <excludeFolder url="file://$MODULE_DIR$/docker-home/carrolac-ros2ws/log" />
       <excludeFolder url="file://$MODULE_DIR$/docker-home/venvs/guillermo-ideapad3" />
       <excludeFolder url="file://$MODULE_DIR$/docker-home/venvs/lac-HP-200-G3-AiO" />
       <excludeFolder url="file://$MODULE_DIR$/site-packages/action_tutorials_py" />
