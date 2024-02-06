@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="GiampieriBOT">
+	<xacro:include filename="$(find carrolac_description)/urdf/chasis_03.xacro"/>
+	<xacro:include filename="$(find carrolac_description)/urdf/modulo_diferencial.urdf" ns="moddif"/>
+	
+	<joint name="joint_modulo_diferencial" type="fixed">
+		<xacro:insert_block name="rftf_Base2EjeTraseroCentro"/>
+		<parent link="link_base" />
+		<child link="link_md1_soporte_motrices" />
+	</joint>
+</robot>

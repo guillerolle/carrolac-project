@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="CH03">
+  <xacro:property name="rftf_Base2AcopleTrasero">
+  	<origin xyz="-0.300 0.000 -0.010" rpy="0 0 0"/>
+  </xacro:property>
+  <xacro:property name="rftf_Base2AcopleDelantero">
+  	<origin xyz="0.300 0.000 -0.010" rpy="0 0 0"/>
+  </xacro:property>
+  <xacro:property name="rftf_Base2EjeTraseroCentro">
+  	<origin xyz="-0.240 0.000 -0.022" rpy="3.1415 0 0"/>
+  </xacro:property>
+  <xacro:property name="rftf_Base2EjeDelanteroCentro">
+  	<origin xyz="0.240 0.000 -0.022" rpy="3.1415 0 0"/>
+  </xacro:property>
+    <xacro:property name="rftf_Base2EjeDelanteroDerecha">
+        <origin xyz="0.240 -0.188 -0.022" rpy="3.1415 0 -1.5708"/>
+    </xacro:property>
+    <xacro:property name="rftf_Base2EjeDelanteroIzquierda">
+        <origin xyz="0.240 0.188 -0.022" rpy="3.1415 0 -1.5708"/>
+    </xacro:property>
+  
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1"/>
+  </material>
+  <material name="yellow">
+    <color rgba="1 1 0.3 1"/>
+  </material>
+
+  
+  <link name="link_base">
+    <inertial>
+    	<origin xyz="0.000 0.000 0.018" rpy="0 0 0"/>
+    	<mass value="13.348"/>
+    	<inertia 	ixx="0.430" 	ixy="0.000" 	ixz="0.000"
+    					iyy="0.462"	iyz="0.000"
+    							izz="0.868"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="file://$(find carrolac_description)/meshes/CHASIS_03.STL" scale="1 1 1"/>
+      </geometry>
+      <material name="yellow"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="file://$(find carrolac_description)/meshes/CHASIS_03.STL" scale="1 1 1"/>
+      </geometry>
+    </collision>
+  </link>
+  
+</robot>

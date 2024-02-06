@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="rueda_caster">
+  <xacro:macro name="build_module" params="prefix">
+    <link
+      name="${prefix}_link_brida">
+      <inertial>
+        <origin
+          xyz="-5.2042E-18 0 0.0017221"
+          rpy="0 0 0" />
+        <mass
+          value="0.2362" />
+        <inertia
+          ixx="0.0002074"
+          ixy="-8.6231E-20"
+          ixz="-4.1413E-22"
+          iyy="0.00030568"
+          iyz="-8.399E-22"
+          izz="0.00051259" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="file://$(find carrolac_description)/meshes/link_brida.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+            rgba="0.8 0.0 0.0 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="file://$(find carrolac_description)/meshes/link_brida.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <link
+      name="${prefix}_link_horquilla">
+      <inertial>
+        <origin
+          xyz="1.8908E-07 0.02249 0.050761"
+          rpy="0 0 0" />
+        <mass
+          value="0.072224" />
+        <inertia
+          ixx="0.00012363"
+          ixy="8.8179E-10"
+          ixz="4.1929E-10"
+          iyy="0.0001408"
+          iyz="-3.5406E-05"
+          izz="0.000144" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="file://$(find carrolac_description)/meshes/link_horquilla.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+            rgba="1.0 1.0 1.0 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="file://$(find carrolac_description)/meshes/link_horquilla.STL" />
+        </geometry>
+      </collision>
+    </link>
+    <joint
+      name="${prefix}_joint_horquilla"
+      type="continuous">
+      <origin
+        xyz="0 0 0.002"
+        rpy="0 0 0" />
+      <parent
+        link="${prefix}_link_brida" />
+      <child
+        link="${prefix}_link_horquilla" />
+      <axis
+        xyz="0 0 1" />
+    </joint>
+    <link
+      name="${prefix}_link_rueda">
+      <inertial>
+        <origin
+          xyz="0.016549 0.029538 -0.010744"
+          rpy="0 0 0" />
+        <mass
+          value="0.97447" />
+        <inertia
+          ixx="0.0036205"
+          ixy="-0.0011336"
+          ixz="-1.1597E-09"
+          iyy="0.0024449"
+          iyz="-7.6933E-10"
+          izz="0.0051466" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="file://$(find carrolac_description)/meshes/link_rueda.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+            rgba="0.2 0.2 0.2 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="file://$(find carrolac_description)/meshes/link_rueda.STL" />
+        </geometry>
+<!--        <surface>-->
+<!--          <contact>-->
+<!--            <ode>-->
+<!--              <sof_cfm>100</sof_cfm>-->
+<!--              <kp>0</kp>-->
+<!--              <kd>0</kd>-->
+<!--            </ode>-->
+<!--          </contact>-->
+<!--        </surface>-->
+      </collision>
+    </link>
+<!--    <gazebo reference="${prefix}_link_rueda">-->
+<!--      <collision>-->
+
+<!--      </collision>-->
+<!--    </gazebo>-->
+    <joint
+      name="${prefix}_joint_rueda"
+      type="continuous">
+      <origin
+        xyz="0.010744 0.057553 0.105"
+        rpy="-1.5708 0 -1.5708" />
+      <parent
+        link="${prefix}_link_horquilla" />
+      <child
+        link="${prefix}_link_rueda" />
+      <axis
+        xyz="0 0 1" />
+    </joint>
+  </xacro:macro>
+</robot>

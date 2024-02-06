@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="carrolac_v2">
+  	<xacro:include filename="$(find carrolac_description)/urdf/chasis_03.xacro"/>
+	<xacro:include filename="$(find carrolac_description)/urdf/mod_dif.xacro" ns="moddif"/>
+	<xacro:include filename="$(find carrolac_description)/urdf/rueda_caster.xacro" ns="caster"/>
+	<xacro:include filename="$(find carrolac_description)/urdf/mod_sensors.xacro" ns="modsensors"/>
+	<xacro:include filename="$(find carrolac_description)/urdf/mod_md00.xacro" ns="md00"/>
+
+  	<xacro:moddif.build_module prefix="moddifT"/>
+	<joint name="moddifT_joint_modulo_diferencial" type="fixed">
+	  <xacro:insert_block name="rftf_Base2EjeTraseroCentro"/>
+	  <parent link="link_base" />
+	  <child link="moddifT_link_soporte_motrices" />
+	</joint>
+
+	<xacro:caster.build_module prefix="casterD"/>
+	<joint name="casterD_joint_rueda_caster" type="fixed">
+	  <xacro:insert_block name="rftf_Base2EjeDelanteroDerecha"/>
+	  <parent link="link_base" />
+	  <child link="casterD_link_brida" />
+	</joint>
+
+	<xacro:caster.build_module prefix="casterI"/>
+	<joint name="casterI_joint_rueda_caster" type="fixed">
+	  <xacro:insert_block name="rftf_Base2EjeDelanteroIzquierda"/>
+	  <parent link="link_base" />
+	  <child link="casterI_link_brida" />
+	</joint>
+
+	<xacro:modsensors.build_module prefix="modsensorsD"/>
+	<joint name="modsensorsD_joint_modulo_sensores" type="fixed">
+	  <xacro:insert_block name="rftf_Base2AcopleDelantero"/>
+	  <parent link="link_base" />
+	  <child link="modsensorsD_link_base" />
+	</joint>
+
+	<xacro:md00.build_module prefix="modsbot"/>
+	<joint name="modsbot_joint_moduloscorbot" type="fixed">
+	  <xacro:insert_block name="rftf_Base2AcopleTrasero"/>
+	  <parent link="link_base" />
+	  <child link="modsbot_link_base" />
+	</joint>
+
+  <gazebo>
+    <self_collide>false</self_collide>
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher"/>
+
+    <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <parameters>$(find carrolac_gazebo)/config/modsensors_controller_velocity.yaml</parameters>
+    </plugin>
+
+  	<plugin
+      filename="ignition-gazebo-imu-system"
+      name="ignition::gazebo::systems::Imu">
+    </plugin>
+
+	<plugin filename="libignition-gazebo-sensors-system.so"
+			name="ignition::gazebo::systems::Sensors" >
+	</plugin>
+
+  </gazebo>
+</robot>

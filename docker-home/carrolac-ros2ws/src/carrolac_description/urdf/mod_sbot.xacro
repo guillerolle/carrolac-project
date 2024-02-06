@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:macro name="build_module" params="prefix">
+      <link
+        name="${prefix}_link_base">
+        <inertial>
+          <origin
+            xyz="-0.108054021244931 -6.78949721999444E-08 0.0484049851585737"
+            rpy="0 0 0" />
+          <mass
+            value="9.15453089518971" />
+          <inertia
+            ixx="0.085126670768749"
+            ixy="2.58404334129752E-08"
+            ixz="-1.08844213882229E-08"
+            iyy="0.085126691797693"
+            iyz="-6.7077388590106E-09"
+            izz="0.0998601414904193" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_base.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.529411764705882 0.549019607843137 0.549019607843137 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_base.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <link
+        name="${prefix}_link_one">
+        <inertial>
+          <origin
+            xyz="-0.0593135451515788 -0.00322725876445507 0.320154858954509"
+            rpy="0 0 0" />
+          <mass
+            value="14.9129316259934" />
+          <inertia
+            ixx="0.145932144728803"
+            ixy="0.00612026711691293"
+            ixz="-0.0110238426104326"
+            iyy="0.254113528367173"
+            iyz="0.00247600075693871"
+            izz="0.247916599392411" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_one.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.529411764705882 0.549019607843137 0.549019607843137 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_one.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_one"
+        type="continuous">
+        <origin
+          xyz="-0.10805388876492 0 0"
+          rpy="0 0 0" />
+        <parent
+          link="${prefix}_link_base" />
+        <child
+          link="${prefix}_link_one" />
+        <axis
+          xyz="0 0 -1" />
+      </joint>
+      <link
+        name="${prefix}_link_two">
+        <inertial>
+          <origin
+            xyz="4.85332329874938E-05 0.0339669542339676 0.1583205027378"
+            rpy="0 0 0" />
+          <mass
+            value="11.4623841158846" />
+          <inertia
+            ixx="0.407890269217217"
+            ixy="6.37848240916327E-05"
+            ixz="-2.5291003153096E-06"
+            iyy="0.043190224560377"
+            iyz="0.00678552253808893"
+            izz="0.406840221932833" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_two.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.529411764705882 0.549019607843137 0.549019607843137 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_two.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_two"
+        type="continuous">
+        <origin
+          xyz="0.07 0 0.372"
+          rpy="1.5708 0 0" />
+        <parent
+          link="${prefix}_link_one" />
+        <child
+          link="${prefix}_link_two" />
+        <axis
+          xyz="0 0 1" />
+      </joint>
+      <link
+        name="${prefix}_link_three">
+        <inertial>
+          <origin
+            xyz="-1.47432084651733E-07 -0.111132038571227 0.0375927278081665"
+            rpy="0 0 0" />
+          <mass
+            value="5.6889976191393" />
+          <inertia
+            ixx="0.066293063521651"
+            ixy="-6.29583836298716E-08"
+            ixz="-5.35286377624852E-08"
+            iyy="0.012551076830058"
+            iyz="-0.000390405491272255"
+            izz="0.0629744677227373" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_three.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.529411764705882 0.549019607843137 0.549019607843137 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_three.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_three"
+        type="continuous">
+        <origin
+          xyz="0 0.28 0"
+          rpy="0 0 1.5708" />
+        <parent
+          link="${prefix}_link_two" />
+        <child
+          link="${prefix}_link_three" />
+        <axis
+          xyz="0 0 1" />
+      </joint>
+      <link
+        name="${prefix}_link_four">
+        <inertial>
+          <origin
+            xyz="0.0382603821035229 -0.00311385230179761 0.0369189530731333"
+            rpy="0 0 0" />
+          <mass
+            value="1.08471916910904" />
+          <inertia
+            ixx="0.000700705072423402"
+            ixy="0.000134315224988601"
+            ixz="3.57613195744678E-06"
+            iyy="0.0024076862804167"
+            iyz="-2.44981684573351E-07"
+            izz="0.00265552184192292" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_four.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_four.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_four"
+        type="continuous">
+        <origin
+          xyz="0 -0.23 0"
+          rpy="0 0 -1.5708" />
+        <parent
+          link="${prefix}_link_three" />
+        <child
+          link="${prefix}_link_four" />
+        <axis
+          xyz="0 0 1" />
+      </joint>
+      <link
+        name="${prefix}_link_five">
+        <inertial>
+          <origin
+            xyz="-1.11022302462516E-16 6.93889390390723E-18 0.123619254184439"
+            rpy="0 0 0" />
+          <mass
+            value="0.381700257851164" />
+          <inertia
+            ixx="0.000373834134119606"
+            ixy="-1.10134884372904E-16"
+            ixz="7.08208539439005E-21"
+            iyy="0.00010972662091672"
+            iyz="-6.21572765462562E-20"
+            izz="0.000413895603400734" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_five.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_five.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_five"
+        type="continuous">
+        <origin
+          xyz="0 -0.0058721 0.036836"
+          rpy="-1.5708 0 -1.5708" />
+        <parent
+          link="${prefix}_link_four" />
+        <child
+          link="${prefix}_link_five" />
+        <axis
+          xyz="0 0 -1" />
+      </joint>
+      <link
+        name="${prefix}_link_finger1">
+        <inertial>
+          <origin
+            xyz="-6.1296E-05 -0.012617 -0.040707"
+            rpy="0 0 0" />
+          <mass
+            value="0.027386" />
+          <inertia
+            ixx="5.3015E-06"
+            ixy="-2.913E-08"
+            ixz="2.3974E-08"
+            iyy="3.6111E-06"
+            iyz="8.9421E-07"
+            izz="2.5485E-06" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_finger1.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.89804 0.91765 0.92941 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_finger1.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_finger1"
+        type="prismatic">
+        <origin
+          xyz="0 0 0.134"
+          rpy="-1.5708 0 0" />
+        <parent
+          link="${prefix}_link_five" />
+        <child
+          link="${prefix}_link_finger1" />
+        <axis
+          xyz="0 0 1" />
+        <limit
+          lower="0"
+          upper="0.024"
+          effort="1e6"
+          velocity="1e6" />
+      </joint>
+      <link
+        name="${prefix}_link_finger2">
+        <inertial>
+          <origin
+            xyz="6.12963094666075E-05 -0.0126172449358797 0.0407068248623931"
+            rpy="0 0 0" />
+          <mass
+            value="0.0273859193296504" />
+          <inertia
+            ixx="5.30147165459215E-06"
+            ixy="2.91297719419656E-08"
+            ixz="2.39739572432032E-08"
+            iyy="3.61114744545449E-06"
+            iyz="-8.94214015242034E-07"
+            izz="2.54854258480312E-06" />
+        </inertial>
+        <visual>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_finger2.STL" />
+          </geometry>
+          <material
+            name="">
+            <color
+              rgba="0.898039215686275 0.917647058823529 0.929411764705882 1" />
+          </material>
+        </visual>
+        <collision>
+          <origin
+            xyz="0 0 0"
+            rpy="0 0 0" />
+          <geometry>
+            <mesh
+              filename="file://$(find sbot_description)/meshes/link_finger2.STL" />
+          </geometry>
+        </collision>
+      </link>
+      <joint
+        name="${prefix}_joint_finger2"
+        type="prismatic">
+        <origin
+          xyz="0 0 0.134"
+          rpy="-1.5708 0 0" />
+        <parent
+          link="${prefix}_link_five" />
+        <child
+          link="${prefix}_link_finger2" />
+        <axis
+          xyz="0 0 -1" />
+        <limit
+          lower="0"
+          upper="0.024"
+          effort="1e6"
+          velocity="1e6" />
+        <!--mimic
+          joint="joint_finger1"
+          multiplier="1"
+          offset="0" /-->
+      </joint>
+      <ros2_control name="${prefix}_control" type="system">
+          <hardware>
+            <plugin>ign_ros2_control/IgnitionSystem</plugin>
+          </hardware>
+
+          <xacro:macro name="joint_position_controller" params="joint_name p_gain:=1 d_gain:=0 i_gain:=0 mimic_joint:=''">
+                <joint name="${joint_name}">
+                    <command_interface name="position">
+                      <param name="min">-10</param>
+                      <param name="max">10</param>
+                    </command_interface>
+                    <state_interface name="position"/>
+                    <state_interface name="velocity"/>
+                    <state_interface name="effort"/>
+                </joint>
+          </xacro:macro>
+
+          <xacro:joint_position_controller joint_name="${prefix}_joint_one" p_gain="1e2" d_gain="1e1" i_gain="1e1"/>
+          <xacro:joint_position_controller joint_name="${prefix}_joint_two" p_gain="1e2" d_gain="1e1" i_gain="1e1"/>
+          <xacro:joint_position_controller joint_name="${prefix}_joint_three" p_gain="1e2" d_gain="1e1" i_gain="1e1"/>
+          <xacro:joint_position_controller joint_name="${prefix}_joint_four" p_gain="1e1" d_gain="1e0" i_gain="1e0"/>
+          <xacro:joint_position_controller joint_name="${prefix}_joint_five" p_gain="1e0" d_gain="1e-1" i_gain="0e1"/>
+          <xacro:joint_position_controller joint_name="${prefix}_joint_finger1" p_gain="1e-1" d_gain="1e-2" i_gain="0e1"/>
+          <xacro:joint_position_controller joint_name="${prefix}_joint_finger2" p_gain="1e-1" d_gain="1e-2" i_gain="0e1"
+                                         mimic_joint="${prefix}_joint_finger1"/>
+
+      </ros2_control>
+  </xacro:macro>
+</robot>

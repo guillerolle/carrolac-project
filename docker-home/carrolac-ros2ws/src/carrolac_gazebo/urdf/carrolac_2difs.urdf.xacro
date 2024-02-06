@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="carrolac_v2">
+  <xacro:include filename="$(find carrolac_description)/urdf/chasis_03.xacro"/>
+
+  <xacro:include filename="$(find carrolac_description)/urdf/mod_dif.xacro" ns="moddif"/>
+
+  <!--xacro:include filename="$(find carrolac_description)/urdf/rueda_caster.xacro" ns="caster"/-->
+
+  <xacro:moddif.build_module prefix="moddifT"/>
+  <joint name="moddifT_joint_modulo_diferencial" type="fixed">
+    <xacro:insert_block name="rftf_Base2EjeTraseroCentro"/>
+    <parent link="link_base" />
+    <child link="moddifT_link_soporte_motrices" />
+  </joint>
+
+  <xacro:moddif.build_module prefix="moddifD"/>
+  <joint name="moddifD_joint_modulo_diferencial" type="fixed">
+    <xacro:insert_block name="rftf_Base2EjeDelanteroCentro"/>
+    <parent link="link_base" />
+    <child link="moddifD_link_soporte_motrices" />
+  </joint>
+
+  <gazebo>
+    <self_collide>false</self_collide>
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher"/>
+
+    <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <parameters>$(find carrolac_gazebo)/config/2difs_controller_velocity.yaml</parameters>
+    </plugin>
+
+    <!--xacro:joint_position_controller joint_name="joint_one" p_gain="1e2" d_gain="1e1" i_gain="1e1"/-->
+  </gazebo>
+</robot>

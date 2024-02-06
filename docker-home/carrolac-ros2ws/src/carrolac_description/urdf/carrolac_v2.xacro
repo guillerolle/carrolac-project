@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="carrolac">
+	<xacro:include filename="$(find carrolac_description)/urdf/chasis_03.xacro"/>
+	
+	<xacro:include filename="$(find carrolac_description)/urdf/mod_dif.xacro" ns="moddif"/>
+
+  	<xacro:moddif.build_module prefix="moddifT"/>
+	<joint name="moddifT_joint_modulo_diferencial" type="fixed">
+	  <xacro:insert_block name="rftf_Base2EjeTraseroCentro"/>
+	  <parent link="link_base" />
+	  <child link="moddifT_link_soporte_motrices" />
+	</joint>
+
+	<xacro:moddif.build_module prefix="moddifD"/>
+	<joint name="moddifD_joint_modulo_diferencial" type="fixed">
+	  <xacro:insert_block name="rftf_Base2EjeDelanteroCentro"/>
+	  <parent link="link_base" />
+	  <child link="moddifD_link_soporte_motrices" />
+	</joint>
+
+</robot>

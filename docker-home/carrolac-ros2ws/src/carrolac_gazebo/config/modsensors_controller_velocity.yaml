@@ -1,0 +1,49 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz
+
+    position_controller:
+      type: position_controllers/JointGroupPositionController
+
+    velocity_controller:
+      type: velocity_controllers/JointGroupVelocityController
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    imu_sensor_broadcaster:
+      type: imu_sensor_broadcaster/IMUSensorBroadcaster
+
+velocity_controller:
+  ros__parameters:
+    joints:
+      - moddifT_joint_rueda_izq
+      - moddifT_joint_rueda_der
+    command_interfaces:
+      - velocity
+    state_interfaces:
+      - position
+      - velocity
+      - effort
+
+position_controller:
+  ros__parameters:
+    joints:
+      - modsbot_joint_one
+      - modsbot_joint_two
+      - modsbot_joint_three
+      - modsbot_joint_four
+      - modsbot_joint_five
+      - modsbot_joint_finger1
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+      - effort
+
+imu_sensor_broadcaster:
+  ros__parameters:
+    sensor_name: modsensorsD_imu_sensor
+    frame_id: modsensorsD_link_imu
+

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="carrolac_v2">
+  <xacro:include filename="$(find carrolac_description)/urdf/carrolac_casters.xacro"/>
+  <gazebo>
+    <self_collide>false</self_collide>
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher"/>
+
+    <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+      <parameters>$(find carrolac_gazebo)/config/moddif_controller_velocity.yaml</parameters>
+    </plugin>
+
+  </gazebo>
+</robot>

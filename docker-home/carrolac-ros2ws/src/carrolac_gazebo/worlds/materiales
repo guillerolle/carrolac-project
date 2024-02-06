@@ -1,0 +1,16 @@
+# MyMaterial.material
+
+material QR0000
+{
+  receive_shadows off
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture 0000.png
+      }
+    }
+  }
+}

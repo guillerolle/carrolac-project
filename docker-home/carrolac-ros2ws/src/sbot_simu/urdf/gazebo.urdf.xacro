@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="scorbot">
+  <link name="world"></link>
+  <xacro:include filename="$(find sbot_description)/urdf/scorbot_v2.urdf"/>
+  <joint name="base_joint" type="fixed">
+    <parent link="world"/>
+    <child link="link_base"/>
+  </joint>
+  <gazebo>
+    <self_collide>true</self_collide>
+    <plugin filename="ignition-gazebo-joint-state-publisher-system"
+      name="gz::sim::systems::JointStatePublisher"/>
+
+    <xacro:macro name="joint_position_controller" params="joint_name p_gain:=1 d_gain:=0 i_gain:=0 mimic_joint:=''">
+      <plugin filename="ignition-gazebo-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <xacro:if value="${mimic_joint == ''}">
+          <xacro:property name="topic_joint" value="${joint_name}"/>
+        </xacro:if>
+        <xacro:unless value="${mimic_joint == ''}">
+          <xacro:property name="topic_joint" value="${mimic_joint}"/>
+        </xacro:unless>
+
+        <joint_name>${joint_name}</joint_name>
+        <p_gain>${p_gain}</p_gain>
+        <d_gain>${d_gain}</d_gain>
+        <i_gain>${i_gain}</i_gain>
+        <i_max>1000</i_max>
+        <i_min>-1000</i_min>
+        <topic>/model/scorbot/joint/${topic_joint}/cmd_pos</topic>
+      </plugin>
+    </xacro:macro>
+
+    <xacro:joint_position_controller joint_name="joint_one" p_gain="1e2" d_gain="1e1" i_gain="1e1"/>
+    <xacro:joint_position_controller joint_name="joint_two" p_gain="1e2" d_gain="1e1" i_gain="1e1"/>
+    <xacro:joint_position_controller joint_name="joint_three" p_gain="1e2" d_gain="1e1" i_gain="1e1"/>
+    <xacro:joint_position_controller joint_name="joint_four" p_gain="1e1" d_gain="1e0" i_gain="1e0"/>
+    <xacro:joint_position_controller joint_name="joint_five" p_gain="1e0" d_gain="1e-1" i_gain="0e1"/>
+    <xacro:joint_position_controller joint_name="joint_finger1" p_gain="1e-1" d_gain="1e-2" i_gain="0e1"/>
+    <xacro:joint_position_controller joint_name="joint_finger2" p_gain="1e-1" d_gain="1e-2" i_gain="0e1"
+                                     mimic_joint="joint_finger1"/>
+
+  </gazebo>
+</robot>
