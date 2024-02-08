@@ -280,5 +280,19 @@
       <pose>3.25 1.75 0.75 0 0 3.14</pose>
     </model>
 
+    <model name="AU0000">
+      <static>true</static>
+      <link name="box">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/duser/carrolac-ros2ws/src/carrolac_gazebo/worlds/AU0000.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>3.25 -0.0 0.75 0 0 3.14</pose>
+    </model>
+
   </world>
 </sdf>
