@@ -27,9 +27,9 @@ class SimpleUse():
         (markerCorners, markerIds, rejected) = \
             self.aruco_detector.detectMarkers(img)
 
-        print("markerCorners: " + str(markerCorners))
-        print("markerIds: " + str(markerIds))
-        print("Rejected: " + str(rejected))
+        # print("markerCorners: " + str(markerCorners))
+        # print("markerIds: " + str(markerIds))
+        # print("Rejected: " + str(rejected))
         img = cv2.aruco.drawDetectedMarkers(img, markerCorners, markerIds)
 
         plotimage = self.myaxis.imshow(img)
