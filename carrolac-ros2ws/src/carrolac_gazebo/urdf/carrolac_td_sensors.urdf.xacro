@@ -47,7 +47,7 @@
       name="gz::sim::systems::JointStatePublisher"/>
 
     <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
-      <parameters>$(find carrolac_gazebo)/config/modsensors_controller_velocity.yaml</parameters>
+      <parameters>$(find carrolac_gazebo)/config/modsensors_controller_diffdrive.yaml</parameters>
     </plugin>
 
   	<plugin

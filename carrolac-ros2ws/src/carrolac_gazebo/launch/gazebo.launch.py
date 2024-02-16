@@ -194,7 +194,7 @@ def generate_launch_description():
     ), )
 
     load_joint_trajectory_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'velocity_controller'],
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active', 'diff_drive_controller'],
         output='screen'
     )
 
@@ -220,7 +220,7 @@ def generate_launch_description():
 
     # TELEOP
     returnList.append(ExecuteProcess(
-        cmd=['ros2', 'run', 'carrolac_kboard', 'teleop'],
+        cmd=['ros2', 'run', 'carrolac_kboard', 'teleop', '--ros-args', '-p', 'use_sim_time:=True'],
         output='screen'
     ))
 

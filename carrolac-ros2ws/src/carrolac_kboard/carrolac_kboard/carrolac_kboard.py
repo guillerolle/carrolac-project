@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 
 from std_msgs.msg import Float64, Float64MultiArray
+from geometry_msgs.msg import TwistStamped
 
 from pynput import keyboard
 
@@ -15,12 +16,13 @@ class KeyboardTeleop(Node):
         super().__init__('keyboard_teleop')
         self.get_logger().info('Creando nodo keyboard_teleop')
         self.pub_velcmd = self.create_publisher(Float64MultiArray, '/velocity_controller/commands', 10)
+        self.pub_diffcmd = self.create_publisher(TwistStamped, '/diff_drive_controller/cmd_vel', 10)
         # self.pub_wheel2 = self.create_publisher(Float64, '/commands/joint_wheel2', 10)
         # self.pub_wheel3 = self.create_publisher(Float64, '/commands/joint_wheel3', 10)
         # self.pub_arm1 = self.create_publisher(Float64, '/commands/joint_arm1', 10)
         # self.pub_arm2 = self.create_publisher(Float64, '/commands/joint_arm2', 10)
 
-        timer_period = 0.5  # seconds
+        timer_period = 0.1  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         self.listener = keyboard.Listener(
@@ -36,6 +38,8 @@ class KeyboardTeleop(Node):
         self.rotCcw = False
 
         self.defaultWheelSpeed = 6.0
+        self.defaultLinearSpeed = 0.5
+        self.defaultAngularSpeed = 0.5
 
     def on_press(self, key):
         try:
@@ -52,7 +56,7 @@ class KeyboardTeleop(Node):
                 case _:
                     self.get_logger().warn('Undefined key command: {0}'.format(key))
         except AttributeError:
-            self.get_logger().info('special key {0} pressed'.format(key))
+            self.get_logger().debug('special key {0} pressed'.format(key))
 
     def on_release(self, key):
         try:
@@ -66,17 +70,23 @@ class KeyboardTeleop(Node):
                 case 'd':
                     self.rotCw = False
         except AttributeError:
-            self.get_logger().info('special key {0} pressed'.format(key))
+            self.get_logger().debug('special key {0} pressed'.format(key))
 
     def timer_callback(self):
         # GET KEYS
         msg_velcmd = Float64MultiArray()
 
-        msg_velcmd.data = [self.defaultWheelSpeed * (- self.moveFw + self.moveBw + (self.rotCcw - self.rotCw)/2.0),
-                           self.defaultWheelSpeed * (- self.moveFw + self.moveBw - (self.rotCcw - self.rotCw)/2.0),
+        msg_velcmd.data = [self.defaultWheelSpeed * (- self.moveFw + self.moveBw + (self.rotCcw - self.rotCw) / 2.0),
+                           self.defaultWheelSpeed * (- self.moveFw + self.moveBw - (self.rotCcw - self.rotCw) / 2.0),
                            ]
 
-        self.pub_velcmd.publish(msg_velcmd)
+        msg_diffcmd = TwistStamped()
+        msg_diffcmd.header.stamp = self.get_clock().now().to_msg()
+        msg_diffcmd.twist.linear.x = self.defaultLinearSpeed * (self.moveFw - self.moveBw)
+        msg_diffcmd.twist.angular.z = self.defaultAngularSpeed * (self.rotCcw - self.rotCw)
+
+        # self.pub_velcmd.publish(msg_velcmd)
+        self.pub_diffcmd.publish(msg_diffcmd)
 
 
 def main(args=None):
