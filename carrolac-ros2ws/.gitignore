@@ -2,6 +2,8 @@ install/
 log/
 build/
 bags/
+frames*.pdf
+frames*.gv
 
 # Ignore generated docs
 *.dox
