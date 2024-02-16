@@ -1,7 +1,8 @@
 #!/usr/bin/bash
 
-docker volume create --driver local --opt type=none --opt device="$(pwd)/../site-packages" --opt o=bind docker-site &&\
-docker volume create --driver local --opt type=none --opt device="$(pwd)/../dist-packages" --opt o=bind docker-dist &&\
+docker volume create --driver local --opt type=none --opt device="$(pwd)/../docker-sources/site-packages" --opt o=bind docker-site &&\
+docker volume create --driver local --opt type=none --opt device="$(pwd)/../docker-sources/dist-packages" --opt o=bind docker-dist &&\
+docker volume create --driver local --opt type=none --opt device="$(pwd)/../docker-sources/share" --opt o=bind docker-share &&\
 xhost +local:root &&\
 docker run --rm -it --net=host --privileged --env="DISPLAY" --env="QT_X11_NO_MITSHM=1" \
   --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw"  \
@@ -11,6 +12,7 @@ docker run --rm -it --net=host --privileged --env="DISPLAY" --env="QT_X11_NO_MIT
   --volume="/etc/localtime:/etc/localtime:ro" \
   --volume="docker-site:/opt/ros/humble/lib/python3.10/site-packages" \
   --volume="docker-dist:/opt/ros/humble/local/lib/python3.10/dist-packages" \
+  --volume="docker-share:/opt/ros/humble/share" \
   ros2:humble_with_gazebo &&\
 xhost -local:root
 
