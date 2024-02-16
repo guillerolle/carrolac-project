@@ -225,7 +225,7 @@ def generate_launch_description():
     ))
 
     # ROSBAG
-    bags_directory = 'bags'
+    bags_directory = 'bags.NOSYNC'
     timestamp = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
     returnList.append(ExecuteProcess(
         cmd=['ros2', 'bag', 'record', '-a', '--output', bags_directory + '/' + timestamp, '--use-sim-time'],

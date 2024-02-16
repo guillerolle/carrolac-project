@@ -152,6 +152,22 @@
         xyz="0 0 0" />
     </joint>
     <link
+      name="${prefix}_link_gopro_optical">
+
+    </link>
+    <joint
+      name="${prefix}_joint_gopro_optical"
+      type="fixed">
+      <origin
+        xyz="0.00 0 0.00"
+        rpy="-1.57 0.0 -1.57"/>
+      <parent
+        link="${prefix}_link_gopro"/>
+      <child
+        link="${prefix}_link_gopro_optical"/>
+    </joint>
+
+    <link
       name="${prefix}_link_lidar">
       <inertial>
         <origin
@@ -218,7 +234,7 @@
       <sensor type="camera" name="right">
         <update_rate>10.0</update_rate>
         <always_on>true</always_on>
-        <ignition_frame_id>camera_link_optical</ignition_frame_id>
+        <ignition_frame_id>${prefix}_link_gopro_optical</ignition_frame_id>
         <pose>0 -0.12 0 0 0 0</pose>
         <topic>stereo_camera/right/image_raw</topic>
         <horizontal_fov>1.3962634</horizontal_fov>
@@ -236,7 +252,7 @@
         <topic>stereo_camera/left/image_raw</topic>
         <update_rate>10.0</update_rate>
         <always_on>true</always_on>
-        <ignition_frame_id>camera_link_optical</ignition_frame_id>
+        <ignition_frame_id>${prefix}_link_gopro_optical</ignition_frame_id>
         <pose>0 0 0 0 0 0</pose>
         <horizontal_fov>1.3962634</horizontal_fov>
         <image>

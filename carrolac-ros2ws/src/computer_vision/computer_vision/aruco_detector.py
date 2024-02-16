@@ -144,8 +144,9 @@ class Features_Node(Node):
                 cv2.drawFrameAxes(img, k, d, rvec, tvec, markerSize)
                 self.get_logger().debug("RetVal: " + str(retval))
                 self.get_logger().debug("Rotation Vector: " + str(np.transpose(rvec)))
-                rot_mat, _ = cv2.Rodrigues(rvec)
-                self.get_logger().debug("Rotation Matrix: " + str(rot_mat))
+                rv = R.from_rotvec(rvec.T)
+                rq = rv.as_quat()
+                self.get_logger().debug("Rotation Euler: " + str(rq[0]))
                 self.get_logger().debug("Translation Vector: " + str(np.transpose(tvec)))
                 # self.get_logger().debug("Translation Vector Original: " + str(tvec))
 
@@ -156,6 +157,10 @@ class Features_Node(Node):
                 t.transform.translation.x = tvec[0][0]
                 t.transform.translation.y = tvec[1][0]
                 t.transform.translation.z = tvec[2][0]
+                t.transform.rotation.x = rq[0][0]
+                t.transform.rotation.y = rq[0][1]
+                t.transform.rotation.z = rq[0][2]
+                t.transform.rotation.w = rq[0][3]
                 self.tf_broadcaster.sendTransform(t)
 
         self.aruco_pub.publish(self.cvbridge.cv2_to_imgmsg(img))
