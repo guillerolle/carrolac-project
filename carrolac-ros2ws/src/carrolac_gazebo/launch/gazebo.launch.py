@@ -224,6 +224,12 @@ def generate_launch_description():
         output='screen'
     ))
 
+    # COMPUTER VISION
+    returnList.append(ExecuteProcess(
+        cmd=['src/computer_vision/computer_vision/aruco_detector.py', '--ros-args', '-p', 'use_sim_time:=True'],
+        output='screen'
+    ))
+
     # ROSBAG
     bags_directory = 'bags.NOSYNC'
     timestamp = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")

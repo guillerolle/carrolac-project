@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
-
 import rclpy
+import tf2_ros
 
 from rclpy.node import Node
 from tf2_ros.static_transform_broadcaster import StaticTransformBroadcaster
 from tf2_ros import TransformBroadcaster
+import tf2_py
+from builtin_interfaces.msg import Duration, Time
 
 from sensor_msgs.msg import Image, CameraInfo
 from tf2_msgs.msg import TFMessage
-from geometry_msgs.msg import TransformStamped, PoseArray
+from geometry_msgs.msg import TransformStamped, PoseArray, Transform
 
 from cv_bridge import CvBridge
 import cv2
@@ -17,14 +19,14 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy.spatial.transform import Rotation as R
 
-markerSize = 0.25
+markerSize = 0.5 * 8 / 10
 markerVertices = 0.5 * markerSize * np.array(
     (
-     (0, -1, 1),
-     (0, 1, 1),
-     (0, 1, -1),
-     (0, -1, -1),
-     )
+        (0, -1, 1),
+        (0, 1, 1),
+        (0, 1, -1),
+        (0, -1, -1),
+    )
 )
 
 markersCenter = (
@@ -48,8 +50,33 @@ for m in markersCenter:
         # print(tf @ o)
         vs.append(tf @ o)
     markerPoints.append(np.array(vs))
+
+
 # print(markerPoints)
 # print(markerPoints[0])
+
+def homogeneous_2_tf2(hom):
+    t = Transform()
+    qq = R.from_matrix(hom[0:3, 0:3]).as_quat()
+    t.rotation.x = qq[0]
+    t.rotation.y = qq[1]
+    t.rotation.z = qq[2]
+    t.rotation.w = qq[3]
+    t.translation.x = hom[0, 3]
+    t.translation.y = hom[1, 3]
+    t.translation.z = hom[2, 3]
+    return t
+
+
+def tf2_2_homogeneous(transf):
+    homogeneous = np.eye(4)
+    rr = R.from_quat([transf.rotation.x, transf.rotation.y,
+                      transf.rotation.z, transf.rotation.w])
+    homogeneous[0:3, 0:3] = rr.as_matrix()
+    homogeneous[0, 3] = transf.translation.x
+    homogeneous[1, 3] = transf.translation.y
+    homogeneous[2, 3] = transf.translation.z
+    return homogeneous
 
 
 class Features_Node(Node):
@@ -78,19 +105,73 @@ class Features_Node(Node):
         )
         # self.get_logger().info(str(dir(self.aruco_detector.getDetectorParameters())))
 
-        plt.ion()
-        self.myfigure, self.myaxis = plt.subplots()
+        # plt.ion()
+        # self.myfigure, self.myaxis = plt.subplots()
 
         self.cameraInfo = None
 
         self.tf_static_broadcaster = StaticTransformBroadcaster(self)
         self.tf_broadcaster = TransformBroadcaster(self)
         self.marker_static_broadcaster()
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
+
+        self.tf_timer = self.create_timer(0.01, self.on_tf_timer)
+        self.tf_map2odom = TransformStamped()
+        self.tf_map2odom.header.frame_id = "map"
+        self.tf_map2odom.child_frame_id = "odom"
+
+    def on_tf_timer(self):
+        ## UPDATE ODOM IF POSSIBLE
+        ## MAP TRANSFORMS
+
+        AUtransforms = []
+        for i in range(1):
+            AU_Frame = "AU{:0>4}".format(i)
+            AU_Frame_GoPro = "AU{:0>4}@gopro".format(i)
+            try:
+                transform = self.tf_buffer.lookup_transform(AU_Frame_GoPro, AU_Frame, Time(sec=0))
+                hom = tf2_2_homogeneous(transform.transform)
+                #
+                transform2 = self.tf_buffer.lookup_transform('map', AU_Frame, Time(sec=0))
+                transform2.transform.translation.x = 0.0
+                transform2.transform.translation.y = 0.0
+                transform2.transform.translation.z = 0.0
+                hom2 = tf2_2_homogeneous(transform2.transform)
+                final_hom = np.eye(4)
+                final_hom[0:3, 0:3] = hom[0:3, 0:3]
+                hom[0:3, 0:3] = np.eye(3)
+                final_hom[:, 3] = hom2@hom[:, 3]
+                self.get_logger().info(str(hom))
+                self.get_logger().info(str(hom2))
+                AUtransforms.append(homogeneous_2_tf2(final_hom))
+            except tf2_ros.TransformException as e:
+                self.get_logger().warn(f'Could not transform {AU_Frame} to {AU_Frame_GoPro}: {e}')
+                pass
+
+        if len(AUtransforms) > 0:
+            # transforms = []
+            # t = TransformStamped()
+            self.tf_map2odom.transform.translation.x += AUtransforms[
+                                                            0].translation.x * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.translation.y += AUtransforms[
+                                                            0].translation.y * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.translation.z += AUtransforms[
+                                                            0].translation.z * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.rotation.x += AUtransforms[0].rotation.x * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.rotation.y += AUtransforms[0].rotation.y * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.rotation.z += AUtransforms[0].rotation.z * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.rotation.w += AUtransforms[0].rotation.w * self.tf_timer.timer_period_ns * 1e-9
+            # transforms.append(t)
+        self.tf_map2odom.header.stamp = self.get_clock().now().to_msg()
+        self.tf_broadcaster.sendTransform(self.tf_map2odom)
 
     def marker_static_broadcaster(self):
         transforms = []
         for i in range(2):
             self.get_logger().info("Creating Static Transform for AU{:0>4}".format(i))
+            eul = R.from_euler(seq="XYZ", angles=[0, 0, 3.14 + (np.pi if i == 1 else 0)])
+            qua = eul.as_quat()
             t = TransformStamped()
             t.header.stamp = self.get_clock().now().to_msg()
             t.header.frame_id = 'map'
@@ -98,6 +179,10 @@ class Features_Node(Node):
             t.transform.translation.x = 3.25
             t.transform.translation.y = 0.0
             t.transform.translation.z = 0.75
+            t.transform.rotation.x = qua[0]
+            t.transform.rotation.y = qua[1]
+            t.transform.rotation.z = qua[2]
+            t.transform.rotation.w = qua[3]
             transforms.append(t)
 
         self.tf_static_broadcaster.sendTransform(transforms)
@@ -130,7 +215,7 @@ class Features_Node(Node):
             # self.get_logger().info(str(d))
 
             self.get_logger().debug("Markers ID: " + str(markerIds))
-
+            transforms = []
             for i in range(nmarkers):
                 mp = np.array(markerPoints[i][0:4, 0:3])
                 # print("Marker Vertices: " + str(markerVertices))
@@ -161,22 +246,21 @@ class Features_Node(Node):
                 t.transform.rotation.y = rq[0][1]
                 t.transform.rotation.z = rq[0][2]
                 t.transform.rotation.w = rq[0][3]
-                self.tf_broadcaster.sendTransform(t)
+                transforms.append(t)
+            self.tf_broadcaster.sendTransform(transforms)
 
         self.aruco_pub.publish(self.cvbridge.cv2_to_imgmsg(img))
-
-
 
         # cv2.imwrite("../aruco_markers/gz.png", img)
 
         # PLOT WITH PYPLOT ###
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        if hasattr(self, 'plotimage'):
-            self.plotimage.set_data(img)
-        else:
-            self.plotimage = self.myaxis.imshow(img)
-        self.myfigure.canvas.draw()
-        self.myfigure.canvas.flush_events()
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # if hasattr(self, 'plotimage'):
+        #     self.plotimage.set_data(img)
+        # else:
+        #     self.plotimage = self.myaxis.imshow(img)
+        # self.myfigure.canvas.draw()
+        # self.myfigure.canvas.flush_events()
         #########################
         # input()
 
