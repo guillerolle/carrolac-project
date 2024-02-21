@@ -263,7 +263,7 @@
         <visual name="visual">
           <geometry>
             <mesh>
-              <uri>file:///home/duser/carrolac-ros2ws/src/carrolac_gazebo/worlds/checkerboard.dae</uri>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/camera_calibrator/checkerboard.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -277,12 +277,12 @@
         <visual name="visual">
           <geometry>
             <mesh>
-              <uri>file:///home/duser/carrolac-ros2ws/src/carrolac_gazebo/worlds/AU0000.dae</uri>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/aruco_markers/meshes/AU0000.dae</uri>
             </mesh>
           </geometry>
         </visual>
       </link>
-      <pose>3.25 -0.0 0.75 0 0 3.14</pose>
+      <pose>3.25 -0.15 0.75 0 0 3.14</pose>
     </model>
 
     <model name="AU0002">
@@ -291,12 +291,68 @@
         <visual name="visual">
           <geometry>
             <mesh>
-              <uri>file:///home/duser/carrolac-ros2ws/src/carrolac_gazebo/worlds/AU0002.dae</uri>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/aruco_markers/meshes/AU0002.dae</uri>
             </mesh>
           </geometry>
         </visual>
       </link>
-      <pose>2.00 -4.25 0.75 0 0 1.57</pose>
+      <pose>1.50 -4.25 0.75 0 0 1.57</pose>
+    </model>
+
+    <model name="AU0004">
+      <static>true</static>
+      <link name="box">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/aruco_markers/meshes/AU0004.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-1.25 -13.00 0.75 0 0 1.57</pose>
+    </model>
+
+    <model name="AU0006">
+      <static>true</static>
+      <link name="box">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/aruco_markers/meshes/AU0006.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-4.6 -22.30 0.75 0 0 0.8</pose>
+    </model>
+
+    <model name="AU0008">
+      <static>true</static>
+      <link name="box">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/aruco_markers/meshes/AU0008.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>4.5 -22.30 0.75 0 0 2.4</pose>
+    </model>
+
+    <model name="AU0010">
+      <static>true</static>
+      <link name="box">
+        <visual name="visual">
+          <geometry>
+            <mesh>
+              <uri>file:///home/duser/carrolac-ros2ws/src/computer_vision/aruco_markers/meshes/AU0010.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+      </link>
+      <pose>-3.25 -0.15 0.75 0 0 0</pose>
     </model>
 
   </world>

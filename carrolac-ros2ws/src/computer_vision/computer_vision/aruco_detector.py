@@ -10,7 +10,8 @@ from builtin_interfaces.msg import Duration, Time
 
 from sensor_msgs.msg import Image, CameraInfo
 from tf2_msgs.msg import TFMessage
-from geometry_msgs.msg import TransformStamped, PoseArray, Transform
+from geometry_msgs.msg import TransformStamped, PoseArray, Transform, Vector3, PoseStamped, Point
+from visualization_msgs.msg import Marker, MarkerArray
 
 from cv_bridge import CvBridge
 import cv2
@@ -30,8 +31,12 @@ markerVertices = 0.5 * markerSize * np.array(
 )
 
 markersCenter = (
-    (3.25, 0.0, 0.75, 0.0, 0.0, 3.14),
-    (2.00, -4.25, 0.75, 0, 0, 1.57),
+    (3.25, -0.15, 0.75, 0.0, 0.0, 3.14),
+    (1.50, -4.25, 0.75, 0, 0, 1.57),
+    (-1.25, -13.00, 0.75, 0, 0, 1.57),
+    (-4.6, -22.30, 0.75, 0, 0, 0.8),
+    (4.5, -22.30, 0.75, 0, 0, 2.4),
+    (-3.25, -0.15, 0.75, 0.0, 0.0, 0),
 )
 
 markerPoints = []
@@ -90,6 +95,7 @@ class Features_Node(Node):
         )
 
         self.aruco_pub = self.create_publisher(Image, "computer_vision/aruco/image_raw", 10)
+        self.error_pub = self.create_publisher(MarkerArray, "computer_vision/aruco/error_vector_array", 10)
 
         self.create_subscription(
             CameraInfo, "/gopro_camera/camera_info", self.camerainfo_callback, 10
@@ -129,54 +135,178 @@ class Features_Node(Node):
         ## MAP TRANSFORMS
 
         AUtransforms = []
-        for i in range(4):
+        pubMarkerArray = MarkerArray()
+        for i in range(len(markersCenter)*2):
             AU_Frame = "AU{:0>4}".format(i)
             AU_Frame_GoPro = "AU{:0>4}@gopro".format(i)
             try:
-                transform = self.tf_buffer.lookup_transform(AU_Frame_GoPro, AU_Frame,
+                tf_aumap2augp = self.tf_buffer.lookup_transform(AU_Frame, AU_Frame_GoPro,
                                                             Time(sec=0))
-                if self.get_clock().now().to_msg().sec - transform.header.stamp.sec >= 1:
+                if self.get_clock().now().to_msg().sec - tf_aumap2augp.header.stamp.sec >= 1:
                     raise tf2_ros.TransformException("Too old")
-                hom = tf2_2_homogeneous(transform.transform)
+                _aumap2augp = tf2_2_homogeneous(tf_aumap2augp.transform)
+
+                tf_map2aumap = self.tf_buffer.lookup_transform('map', AU_Frame, Time(sec=0))
+                _map2aumap = tf2_2_homogeneous(tf_map2aumap.transform)
+
+                AUtransforms.append((_map2aumap, _aumap2augp))
+
+                ### PUBLISH ERROR
+                pubMark = Marker()
+                pubMark.header.stamp = self.get_clock().now().to_msg()
+                pubMark.header.frame_id = AU_Frame
+                pubMark.id = i
+                pubMark.action = Marker.ADD
+                pubMark.type = Marker.LINE_LIST
+                pubMark.points = [Point(x=0.0, y=0.0, z=0.0),
+                                  Point(x=tf_aumap2augp.transform.translation.x,
+                                        y=tf_aumap2augp.transform.translation.y,
+                                        z=tf_aumap2augp.transform.translation.z)]
+                pubMark.scale.x = 0.1
+                pubMark.scale.y = 0.1
+                pubMark.scale.z = 0.1
+                pubMark.color.g = 1.0
+                pubMark.color.a = 1.0
+                pubMarkerArray.markers.append(pubMark)
+
+                ### PUBLISH ERROR IN ROTATION
+                rvec = R.from_quat([tf_aumap2augp.transform.rotation.x, tf_aumap2augp.transform.rotation.y,
+                                    tf_aumap2augp.transform.rotation.z, tf_aumap2augp.transform.rotation.w]).as_rotvec()
+                pubMark = Marker()
+                pubMark.header.stamp = self.get_clock().now().to_msg()
+                pubMark.header.frame_id = AU_Frame
+                pubMark.id = 100+i
+                pubMark.action = Marker.ADD
+                pubMark.type = Marker.LINE_LIST
+                pubMark.points = [Point(x=0.0, y=0.0, z=0.0),
+                                  Point(x=rvec[0],
+                                        y=rvec[1],
+                                        z=rvec[2])]
+                pubMark.scale.x = 0.1
+                pubMark.scale.y = 0.1
+                pubMark.scale.z = 0.1
+                pubMark.color.b = 1.0
+                pubMark.color.a = 1.0
+                pubMarkerArray.markers.append(pubMark)
+
+
+                ### PUBLISH ERROR MAP FIXED
+                pubMark = Marker()
+                pubMark.header.stamp = self.get_clock().now().to_msg()
+                pubMark.header.frame_id = "map"
+                pubMark.id = 1000+i
+                pubMark.action = Marker.ADD
+                pubMark.type = Marker.LINE_LIST
+                pubMark.points = [Point(x=0.0, y=0.0, z=0.0),
+                                  Point(x=tf_map2aumap.transform.translation.x,
+                                        y=tf_map2aumap.transform.translation.y,
+                                        z=tf_map2aumap.transform.translation.z)]
+                pubMark.scale.x = 0.01
+                pubMark.scale.y = 0.01
+                pubMark.scale.z = 0.01
+                pubMark.color.a = 1.0
+                pubMark.color.g = 1.0
+                pubMark.color.r = 1.0
+                pubMarkerArray.markers.append(pubMark)
                 #
-                transform2 = self.tf_buffer.lookup_transform('map', AU_Frame, Time(sec=0))
-                transform2.transform.translation.x = 0.0
-                transform2.transform.translation.y = 0.0
-                transform2.transform.translation.z = 0.0
-                hom2 = tf2_2_homogeneous(transform2.transform)
+                continue
+                tf_map2aumap.transform.translation.x = 0.0
+                tf_map2aumap.transform.translation.y = 0.0
+                tf_map2aumap.transform.translation.z = 0.0
+                hom2 = tf2_2_homogeneous(tf_map2aumap.transform)
                 final_hom = np.eye(4)
-                final_hom[0:3, 0:3] = hom[0:3, 0:3]
-                hom[0:3, 0:3] = np.eye(3)
-                final_hom[:, 3] = hom2@hom[:, 3]
-                # self.get_logger().info(str(hom))
+                final_hom[0:3, 0:3] = _aumap2augp[0:3, 0:3]
+                _aumap2augp[0:3, 0:3] = np.eye(3)
+                final_hom[:, 3] = hom2@_aumap2augp[:, 3]
+                # self.get_logger().info(str(_aumap2augp))
                 # self.get_logger().info(str(hom2))
-                AUtransforms.append(homogeneous_2_tf2(final_hom))
+                # AUtransforms.append(homogeneous_2_tf2(final_hom))
             except tf2_ros.TransformException as e:
                 self.get_logger().debug(f'Could not transform {AU_Frame} to {AU_Frame_GoPro}: {e}')
                 pass
 
         error = Transform()
-        n = len(AUtransforms)
+        error_rotvec = np.zeros(3)
+        n = float(len(AUtransforms))
         for t in AUtransforms:
-            error.translation.x += t.translation.x/n
-            error.translation.y += t.translation.y/n
-            error.translation.z += t.translation.z/n
-            error.rotation.x += t.rotation.x/n
-            error.rotation.y += t.rotation.y/n
-            error.rotation.z += t.rotation.z/n
-            error.rotation.w += t.rotation.w/n
+            _map2aumapnotras = t[0]
+            _map2aumapnotras[0:3, 3] = np.zeros(3)
+            _map2augpnotras = _map2aumapnotras@t[1]
+            e = homogeneous_2_tf2(_map2augpnotras)
+            error.translation.x += e.translation.x/n
+            error.translation.y += e.translation.y/n
+            error.translation.z += e.translation.z/n
 
-        Kp = 1.0
+            rt = t[1]
+            rt[0:3, 3] = R.from_matrix(t[1][0:3, 0:3]).as_rotvec()
+            rr = _map2aumapnotras@rt
+            # re = R.from_matrix(rr[0:3, 0:3]).as_rotvec()/n
+            re = rr[0:3, 3]
+            error_rotvec += re/n
+            # error_rotvec += R.from_matrix(np.linalg.inv(_map2augpnotras[0:3, 0:3])).as_rotvec()/n
+            # error.rotation.x += e.rotation.x/n
+            # error.rotation.y += e.rotation.y/n
+            # error.rotation.z += e.rotation.z/n
+            # error.rotation.w += e.rotation.w/n
+        error_quat = R.from_rotvec(error_rotvec).as_quat()
+        error.rotation.x = error_quat[0]
+        error.rotation.y = error_quat[1]
+        error.rotation.z = error_quat[2]
+        error.rotation.w = error_quat[3]
+
+        ### PUBLISH ERROR
+        pubMark = Marker()
+        pubMark.header.stamp = self.get_clock().now().to_msg()
+        pubMark.header.frame_id = "map"
+        pubMark.id = -1
+        pubMark.action = Marker.ADD
+        pubMark.type = Marker.LINE_LIST
+        pubMark.points = [Point(x=0.0, y=0.0, z=0.0),
+                          Point(x=error.translation.x, y=error.translation.y, z=error.translation.z)]
+        pubMark.scale.x = 0.1
+        pubMark.scale.y = 0.1
+        pubMark.scale.z = 0.1
+        pubMark.color.a = 1.0
+        pubMark.color.r = 1.0
+        pubMarkerArray.markers.append(pubMark)
+
+        ### PUBLISH ERROR IN ROTATION
+        pubMark = Marker()
+        pubMark.header.stamp = self.get_clock().now().to_msg()
+        pubMark.header.frame_id = "map"
+        pubMark.id = -2
+        pubMark.action = Marker.ADD
+        pubMark.type = Marker.LINE_LIST
+        pubMark.points = [Point(x=0.0, y=0.0, z=0.0),
+                          Point(x=error_rotvec[0], y=error_rotvec[1], z=error_rotvec[2])]
+        pubMark.scale.x = 0.1
+        pubMark.scale.y = 0.1
+        pubMark.scale.z = 0.1
+        pubMark.color.a = 1.0
+        pubMark.color.g = 1.0
+        pubMark.color.b = 1.0
+        pubMarkerArray.markers.append(pubMark)
+
+        self.error_pub.publish(pubMarkerArray)
+
+        KpR = -0.5
+        KpT = -1.0
         if len(AUtransforms) > 0:
             # transforms = []
             # t = TransformStamped()
-            self.tf_map2odom.transform.translation.x += Kp * error.translation.x * self.tf_timer.timer_period_ns * 1e-9
-            self.tf_map2odom.transform.translation.y += Kp * error.translation.y * self.tf_timer.timer_period_ns * 1e-9
-            self.tf_map2odom.transform.translation.z += Kp * error.translation.z * self.tf_timer.timer_period_ns * 1e-9
-            self.tf_map2odom.transform.rotation.x += Kp * error.rotation.x * self.tf_timer.timer_period_ns * 1e-9
-            self.tf_map2odom.transform.rotation.y += Kp * error.rotation.y * self.tf_timer.timer_period_ns * 1e-9
-            self.tf_map2odom.transform.rotation.z += Kp * error.rotation.z * self.tf_timer.timer_period_ns * 1e-9
-            self.tf_map2odom.transform.rotation.w += Kp * error.rotation.w * self.tf_timer.timer_period_ns * 1e-9
+            # self.get_logger().info("Error rotvec: " + str(error_rotvec))
+            self.tf_map2odom.transform.translation.x += KpT * error.translation.x * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.translation.y += KpT * error.translation.y * self.tf_timer.timer_period_ns * 1e-9
+            self.tf_map2odom.transform.translation.z += KpT * error.translation.z * self.tf_timer.timer_period_ns * 1e-9
+            map2odom_rotvec = R.from_matrix(tf2_2_homogeneous(self.tf_map2odom.transform)[0:3, 0:3]).as_rotvec()
+            map2odom_rotvec += KpR * error_rotvec * self.tf_timer.timer_period_ns * 1e-9
+            map2odom_quat = R.from_rotvec(map2odom_rotvec).as_quat()
+            self.tf_map2odom.transform.rotation.x = map2odom_quat[0]
+            self.tf_map2odom.transform.rotation.y = map2odom_quat[1]
+            self.tf_map2odom.transform.rotation.z = map2odom_quat[2]
+            self.tf_map2odom.transform.rotation.w = map2odom_quat[3]
+            # self.get_logger().info(str(self.tf_map2odom))
+            # self.get_logger().info("map2odom rotvec: " + str(map2odom_rotvec))
             # transforms.append(t)
         self.tf_map2odom.header.stamp = self.get_clock().now().to_msg()
         self.tf_broadcaster.sendTransform(self.tf_map2odom)
@@ -229,21 +359,28 @@ class Features_Node(Node):
             d = np.array(self.cameraInfo.d)
 
             ## HARDCODEANDO PARAMETROS PORQUE NO LOGRE HACER CALIBRACION CON GAZEBO
-            image_width = 910
-            image_height = 512
-            hfov = 2
-            focal_length = image_width / (2*np.tan(hfov / 2))
-            cx = image_width/2
-            cy = image_height/2
-            if k[0, 0] != focal_length:
+            # image_width = 910
+            # image_height = 512
+            # hfov = 2
+            # focal_length = image_width / (2*np.tan(hfov / 2))
+            # cx = image_width/2
+            # cy = image_height/2
+            # dk12 = np.sqrt(image_width**2 + image_height**2)/(2*np.tan(hfov/2)*image_width)
+            # dk12 = 0.5*np.tan(hfov/2)**2
+            fx = 292.5241
+            fy = 292.4264
+            cx = 454.60223
+            cy = 255.70208
+            dk = [-0.000305, -0.000239, 0.000055, 0.000027, 0.000000]
+            if k[0, 0] != fx:
                 self.get_logger().debug("Camera Intrinsic fx differs from expected. Got: " + str(k[0, 0]) +\
-                                        "\tExpected: " + str(focal_length) + ". Hard coding...")
-                k[0, 0] = focal_length
+                                        "\tExpected: " + str(fx) + ". Hard coding...")
+                k[0, 0] = fx
 
-            if k[1, 1] != focal_length:
+            if k[1, 1] != fy:
                 self.get_logger().debug("Camera Intrinsic fy differs from expected. Got: " + str(k[1, 1]) +\
-                                        "\tExpected: " + str(focal_length) + ". Hard coding...")
-                k[1, 1] = focal_length
+                                        "\tExpected: " + str(fy) + ". Hard coding...")
+                k[1, 1] = fy
 
             if k[0, 2] != cx:
                 self.get_logger().debug("Camera Intrinsic cx differs from expected. Got: " + str(k[0, 2]) +\
@@ -254,6 +391,12 @@ class Features_Node(Node):
                 self.get_logger().debug("Camera Intrinsic cy differs from expected. Got: " + str(k[1, 2]) +\
                                         "\tExpected: " + str(cy) + ". Hard coding...")
                 k[1, 2] = cy
+            for _d in range(5):
+                if d[_d] != dk[_d]:
+                    self.get_logger().debug("Camera Intrinsic Distortion k" + str(_d) + " differs from expected.\
+                                            Got: " + str(d[_d]) +\
+                                            "\tExpected: " + str(dk[_d]) + ". Hard coding...")
+                    d[_d] = dk[_d]
             ###########################################################
 
             # self.get_logger().info(str(k))

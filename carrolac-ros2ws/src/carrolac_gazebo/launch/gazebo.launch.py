@@ -16,6 +16,7 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from ros2pkg.api import PackageNotFound
 
+
 # from ignition.common import set_verbosity
 
 
@@ -36,8 +37,8 @@ def generate_launch_description():
     returnList.append(sim_on_arg)
 
     returnList.append(DeclareLaunchArgument(name='bag_on', default_value="False",
-                          description='Indica si la simulación será grabada en un ROSBAG',
-                          choices=["False", "True"]))
+                                            description='Indica si la simulación será grabada en un ROSBAG',
+                                            choices=["False", "True"]))
 
     trajectory_control_arg = DeclareLaunchArgument(name='trajectory_control', default_value="False",
                                                    description='Determina el uso de control de juntas '
@@ -82,7 +83,7 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
         launch_arguments={'gz_args': [PythonExpression(['"-r " if ', LaunchConfiguration('sim_on'), ' else " "']),
-                                      " --record ", "--verbose 4 ",
+                                      # " --record ", "--verbose 4 ",
                                       os.path.join(default_package_path, 'worlds', 'factory.sdf')
                                       ]
                           }.items()

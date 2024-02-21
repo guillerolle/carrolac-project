@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/bassystem support or before trying with your own collected data. The machine hall datasets have the MAV being picked up in the beginning and then set down, we normally skip this part, but it should be able to be handled by the filter if SLAM features are enabled. Please take a look at the run_ros_eth.sh script for some reasonable default values (they might still need to be tuned).h
 for x in 3.25 3.15 3.35
 do
   for y in 2.25 2.15 2.35

@@ -215,12 +215,42 @@ Visualization Manager:
           Value: true
         AU0001:
           Value: false
+        AU0001@gopro:
+          Value: true
         AU0002:
           Value: true
         AU0002@gopro:
           Value: true
         AU0003:
           Value: false
+        AU0003@gopro:
+          Value: true
+        AU0004:
+          Value: true
+        AU0004@gopro:
+          Value: true
+        AU0005:
+          Value: true
+        AU0006:
+          Value: true
+        AU0006@gopro:
+          Value: true
+        AU0007:
+          Value: true
+        AU0008:
+          Value: true
+        AU0008@gopro:
+          Value: true
+        AU0009:
+          Value: true
+        AU0010:
+          Value: true
+        AU0010@gopro:
+          Value: true
+        AU0011:
+          Value: true
+        AU0038@gopro:
+          Value: true
         All Enabled: false
         casterD_link_brida:
           Value: false
@@ -295,6 +325,22 @@ Visualization Manager:
             {}
           AU0003:
             {}
+          AU0004:
+            {}
+          AU0005:
+            {}
+          AU0006:
+            {}
+          AU0007:
+            {}
+          AU0008:
+            {}
+          AU0009:
+            {}
+          AU0010:
+            {}
+          AU0011:
+            {}
           odom:
             link_base:
               casterD_link_brida:
@@ -330,7 +376,21 @@ Visualization Manager:
                   modsensorsD_link_gopro_optical:
                     AU0000@gopro:
                       {}
+                    AU0001@gopro:
+                      {}
                     AU0002@gopro:
+                      {}
+                    AU0003@gopro:
+                      {}
+                    AU0004@gopro:
+                      {}
+                    AU0006@gopro:
+                      {}
+                    AU0008@gopro:
+                      {}
+                    AU0010@gopro:
+                      {}
+                    AU0038@gopro:
                       {}
                 modsensorsD_link_imu:
                   {}
@@ -386,6 +446,18 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /computer_vision/aruco/image_raw
       Value: true
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Errores
+      Namespaces:
+        "": true
+      Topic:
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /computer_vision/aruco/error_vector_array
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -432,25 +504,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 9.105279922485352
+      Distance: 6.143032073974609
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0.7980313301086426
-        Y: -0.3921065628528595
-        Z: 0.23011082410812378
+        X: -0.3130780756473541
+        Y: -1.12427818775177
+        Z: 0.3420693576335907
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.4503978490829468
+      Pitch: 0.2903974950313568
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.0353970527648926
+      Yaw: 1.3540376424789429
     Saved: ~
 Window Geometry:
   ArUco:
