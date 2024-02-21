@@ -16,11 +16,13 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from ros2pkg.api import PackageNotFound
 
+# from ignition.common import set_verbosity
+
 
 def generate_launch_description():
     returnList = []
     default_package_path = get_package_share_path('carrolac_gazebo')
-    default_model_path = default_package_path / 'urdf/carrolac_2difs.urdf.xacro'
+    default_model_path = default_package_path / 'urdf/carrolac_td_sensors.urdf.xacro'
 
     description_package_path = get_package_share_path('carrolac_description')
 
@@ -32,6 +34,10 @@ def generate_launch_description():
                                        description='Indica si la simulación empieza ejecutandose o pausada',
                                        choices=["False", "True"])
     returnList.append(sim_on_arg)
+
+    returnList.append(DeclareLaunchArgument(name='bag_on', default_value="False",
+                          description='Indica si la simulación será grabada en un ROSBAG',
+                          choices=["False", "True"]))
 
     trajectory_control_arg = DeclareLaunchArgument(name='trajectory_control', default_value="False",
                                                    description='Determina el uso de control de juntas '
@@ -150,10 +156,8 @@ def generate_launch_description():
         package='ros_gz_bridge',
         executable='parameter_bridge',
         arguments=[
-            '/stereo_camera/left/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
-            '/stereo_camera/left/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
-            '/stereo_camera/right/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
-            '/stereo_camera/right/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            '/gopro_camera/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            '/gopro_camera/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
         ],
         # remappings=[
         #     (
@@ -234,6 +238,7 @@ def generate_launch_description():
     bags_directory = 'bags.NOSYNC'
     timestamp = datetime.datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
     returnList.append(ExecuteProcess(
+        condition=ParameterValue(LaunchConfiguration("bag_on"), value_type=bool),
         cmd=['ros2', 'bag', 'record', '-a', '--output', bags_directory + '/' + timestamp, '--use-sim-time'],
         output='screen',
     ))
