@@ -67,16 +67,6 @@ def generate_launch_description():
     )
     returnList.append(robot_state_publisher)
 
-    # RViz
-    rviz = Node(
-        package='rviz2',
-        executable='rviz2',
-        arguments=[
-            '-d', os.path.join(description_package_path, 'rviz', 'urdf.rviz')
-        ]
-    )
-    returnList.append(rviz)
-
     # Gazebo Sim
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     gazebo = IncludeLaunchDescription(
@@ -229,10 +219,14 @@ def generate_launch_description():
         output='screen'
     ))
 
-    # COMPUTER VISION
+    # RQT
+    returnList.append(DeclareLaunchArgument(name='rqt_on', default_value="False",
+                                            description='Indica si inciar o no el nodo de computer vision',
+                                            choices=["False", "True"]))
     returnList.append(ExecuteProcess(
-        cmd=['src/computer_vision/computer_vision/aruco_detector.py', '--ros-args', '-p', 'use_sim_time:=True'],
-        output='screen'
+        condition=ParameterValue(LaunchConfiguration("rqt_on"), value_type=bool),
+        cmd=['rqt', '--perspective-file', os.path.join(default_package_path, 'rqt', 'Default.perspective')],
+        output='screen',
     ))
 
     # ROSBAG
@@ -242,6 +236,30 @@ def generate_launch_description():
         condition=ParameterValue(LaunchConfiguration("bag_on"), value_type=bool),
         cmd=['ros2', 'bag', 'record', '-a', '--output', bags_directory + '/' + timestamp, '--use-sim-time'],
         output='screen',
+    ))
+
+    # RViz
+    returnList.append(DeclareLaunchArgument(name='rviz', default_value="False",
+                                            description='Indica si inciar o no rviz',
+                                            choices=["False", "True"]))
+    rviz = Node(
+        condition=ParameterValue(LaunchConfiguration("rviz"), value_type=bool),
+        package='rviz2',
+        executable='rviz2',
+        arguments=[
+            '-d', os.path.join(description_package_path, 'rviz', 'urdf.rviz')
+        ]
+    )
+    returnList.append(rviz)
+
+    # COMPUTER VISION
+    returnList.append(DeclareLaunchArgument(name='computer_vision', default_value="False",
+                                            description='Indica si inciar o no el nodo de computer vision',
+                                            choices=["False", "True"]))
+    returnList.append(ExecuteProcess(
+        condition=ParameterValue(LaunchConfiguration("computer_vision"), value_type=bool),
+        cmd=['src/computer_vision/computer_vision/aruco_detector.py', '--ros-args', '-p', 'use_sim_time:=True'],
+        output='screen'
     ))
 
     return LaunchDescription(returnList)

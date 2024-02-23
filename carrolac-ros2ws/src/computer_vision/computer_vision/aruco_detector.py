@@ -12,6 +12,7 @@ from sensor_msgs.msg import Image, CameraInfo
 from tf2_msgs.msg import TFMessage
 from geometry_msgs.msg import TransformStamped, PoseArray, Transform, Vector3, PoseStamped, Point
 from visualization_msgs.msg import Marker, MarkerArray
+from nav_msgs.msg import Odometry
 
 from cv_bridge import CvBridge
 import cv2
@@ -100,6 +101,11 @@ class Features_Node(Node):
         self.create_subscription(
             CameraInfo, "/gopro_camera/camera_info", self.camerainfo_callback, 10
         )
+
+        self.create_subscription(
+            Odometry, "/diff_drive_controller/odom", self.odom_callback, 10
+        )
+        self.odomonly_pub = self.create_publisher(Odometry, "/odometry_only/odom", 10)
 
         self.cvbridge = CvBridge()
         # self.qcd = cv2.QRCodeDetector()
@@ -309,7 +315,19 @@ class Features_Node(Node):
             # self.get_logger().info("map2odom rotvec: " + str(map2odom_rotvec))
             # transforms.append(t)
         self.tf_map2odom.header.stamp = self.get_clock().now().to_msg()
-        self.tf_broadcaster.sendTransform(self.tf_map2odom)
+        tfpubs = [self.tf_map2odom]
+
+        # try:
+        #     tf_odomonly = self.tf_buffer.lookup_transform('link_base', 'odom',
+        #                                                 Time(sec=0))
+        #     tf_odomonly.header.frame_id = 'map'
+        #     tf_odomonly.child_frame_id = 'link_base_odomonly'
+        #     tfpubs.append(tf_odomonly)
+        # except tf2_ros.TransformException as e:
+        #     self.get_logger().debug(f'Could not transform <odom> to <link_base>: {e}')
+        #     pass
+
+        self.tf_broadcaster.sendTransform(tfpubs)
 
     def marker_static_broadcaster(self):
         transforms = []
@@ -333,6 +351,13 @@ class Features_Node(Node):
             transforms.append(t)
 
         self.tf_static_broadcaster.sendTransform(transforms)
+
+    def odom_callback(self, msg: Odometry):
+        od = Odometry()
+        msg.header.frame_id = 'map'
+        msg.child_frame_id = 'base_link_odomonly'
+        msg.pose.pose.position.z = 0.20
+        self.odomonly_pub.publish(msg)
 
     def camerainfo_callback(self, msg):
         self.cameraInfo = msg
@@ -358,15 +383,8 @@ class Features_Node(Node):
             k = np.array(self.cameraInfo.k).reshape([3, 3])
             d = np.array(self.cameraInfo.d)
 
-            ## HARDCODEANDO PARAMETROS PORQUE NO LOGRE HACER CALIBRACION CON GAZEBO
-            # image_width = 910
-            # image_height = 512
-            # hfov = 2
-            # focal_length = image_width / (2*np.tan(hfov / 2))
-            # cx = image_width/2
-            # cy = image_height/2
-            # dk12 = np.sqrt(image_width**2 + image_height**2)/(2*np.tan(hfov/2)*image_width)
-            # dk12 = 0.5*np.tan(hfov/2)**2
+            ## HARDCODEANDO PARAMETROS PORQUE NO LOGRE CARGARLOS LA CONFIGURACIÓN EN GAZEBO
+            ## (EL image_info PUBLICA VALORES POR DEFECTO Y NO PUEDO CAMBIARLOS)
             fx = 292.5241
             fy = 292.4264
             cx = 454.60223
@@ -414,6 +432,10 @@ class Features_Node(Node):
                 (retval, rvec, tvec) = cv2.solvePnP(objectPoints=markerVertices,
                                                     imagePoints=mc,
                                                     cameraMatrix=k, distCoeffs=d)
+
+                ## IGNORO MARCADORES LEJANOS PORQUE TIENEN MUCHA IMPRECISIÓN Y RUIDO
+                if np.linalg.norm(tvec) >= 4:
+                    continue
                 cv2.drawFrameAxes(img, k, d, rvec, tvec, markerSize)
                 self.get_logger().debug("RetVal: " + str(retval))
                 self.get_logger().debug("Rotation Vector: " + str(np.transpose(rvec)))
